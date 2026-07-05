@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>📅 نظام الإجازات</h1>
+
+<form method="post" class="form panel">
+  <label>بحث الإداري</label>
+  <input id="leaveSearch" type="text" placeholder="اكتب الاسم / Discord ID / ID اللاعب / اليوزر / الرتبة" oninput="staffSearch('leaveSearch','leaveStaff','leaveDetails')">
+
+  <label>اختيار الإداري</label>
+  <select id="leaveStaff" name="discord_id" required onchange="showStaffDetails('leaveStaff','leaveDetails')">
+    <option value="">ابدأ البحث ثم اختر الإداري</option>
+    {% for s in staff_options %}
+      <option value="{{ s.discord_id }}">{{ s.name }} | {{ s.rank }} | Discord: {{ s.discord_id }} | ID: {{ s.player_id }} | {{ s.position }}</option>
+    {% endfor %}
+  </select>
+  <div id="leaveDetails" class="details-box"></div>
+  <label>من تاريخ</label><input type="date" name="start_date" required>
+  <label>إلى تاريخ</label><input type="date" name="end_date" required>
+  <label>سبب الإجازة</label><input name="reason">
+  <label>الحالة</label>
+  <select name="status">{% for x in LEAVE_STATUSES %}<option value="{{ x }}">{{ x }}</option>{% endfor %}</select>
+  <label>المعتمد من</label>
+  <select name="approved_by" required>
+    <option value="">اختر مسؤول الادارة العليا</option>
+    {% for s in high_staff %}
+      <option value="{{ s.name }} - {{ s.discord_id }}">{{ s.name }} | {{ s.rank }} | ID: {{ s.player_id }}</option>
+    {% endfor %}
+  </select>
+  {% if not high_staff %}
+    <small class="hint">لا يوجد شخص مسجل بمنصب مسؤول الادارة العليا في إدارة البيانات.</small>
+  {% endif %}
+  <label>ملاحظات</label><textarea name="notes"></textarea>
+  <button class="btn">إنشاء إجازة</button>
+</form>
+
+<section class="panel">
+<table>
+<tr><th>رقم</th><th>Discord ID</th><th>ID اللاعب</th><th>الاسم</th><th>الرتبة</th><th>من</th><th>إلى</th><th>الأيام</th><th>الحالة</th><th>إجراء</th></tr>
+{% for r in rows %}
+<tr>
+<td>{{ r.leave_no }}</td><td>{{ r.discord_id }}</td><td>{{ r.player_id }}</td><td>{{ r.name }}</td><td>{{ r.rank }}</td>
+<td>{{ r.start_date }}</td><td>{{ r.end_date }}</td><td>{{ r.days }}</td><td><span class="badge">{{ r.status }}</span></td>
+<td>
+  <a class="mini good" href="{{ url_for('leave_approve', id=r.id) }}">اعتماد</a>
+  <a class="mini" href="{{ url_for('leave_end', id=r.id) }}">إنهاء</a>
+  <a class="mini bad" href="{{ url_for('leave_reject', id=r.id) }}">رفض</a>
+</td>
+</tr>
+{% else %}
+<tr><td colspan="10">لا توجد إجازات</td></tr>
+{% endfor %}
+</table>
+</section>
+{% endblock %}

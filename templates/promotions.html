@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>⭐ نظام الترقيات والتنزيلات</h1>
+
+<form method="post" class="form panel">
+  <label>بحث الإداري</label>
+  <input id="promoSearch" type="text" placeholder="اكتب الاسم / Discord ID / ID اللاعب / اليوزر / الرتبة" oninput="staffSearch('promoSearch','promoStaff','promoDetails')">
+
+  <label>اختيار الإداري</label>
+  <select id="promoStaff" name="discord_id" required onchange="showStaffDetails('promoStaff','promoDetails')">
+    <option value="">ابدأ البحث ثم اختر الإداري</option>
+    {% for s in staff_options %}
+      <option value="{{ s.discord_id }}">{{ s.name }} | {{ s.rank }} | Discord: {{ s.discord_id }} | ID: {{ s.player_id }} | {{ s.position }}</option>
+    {% endfor %}
+  </select>
+  <div id="promoDetails" class="details-box"></div>
+  <label>إلى رتبة</label>
+  <select name="to_rank">{% for x in RANKS %}<option value="{{ x }}">{{ x }}</option>{% endfor %}</select>
+  <label>السبب</label><input name="reason">
+  <label>الحالة</label>
+  <select name="status">{% for x in PROMOTION_STATUSES %}<option value="{{ x }}">{{ x }}</option>{% endfor %}</select>
+  <label>المعتمد من</label>
+  <select name="approved_by" required>
+    <option value="">اختر مسؤول الادارة العليا</option>
+    {% for s in high_staff %}
+      <option value="{{ s.name }} - {{ s.discord_id }}">{{ s.name }} | {{ s.rank }} | ID: {{ s.player_id }}</option>
+    {% endfor %}
+  </select>
+  {% if not high_staff %}
+    <small class="hint">لا يوجد شخص مسجل بمنصب مسؤول الادارة العليا في إدارة البيانات.</small>
+  {% endif %}
+  <label>ملاحظات</label><textarea name="notes"></textarea>
+  <button class="btn">إنشاء طلب</button>
+</form>
+
+<section class="panel">
+<table>
+<tr><th>رقم</th><th>Discord ID</th><th>ID اللاعب</th><th>الاسم</th><th>من رتبة</th><th>إلى رتبة</th><th>نوع العملية</th><th>الحالة</th><th>إجراء</th></tr>
+{% for r in rows %}
+<tr>
+<td>{{ r.request_no }}</td><td>{{ r.discord_id }}</td><td>{{ r.player_id }}</td><td>{{ r.name }}</td>
+<td>{{ r.from_rank }}</td><td>{{ r.to_rank }}</td><td>{{ r.operation_type }}</td><td><span class="badge">{{ r.status }}</span></td>
+<td>
+  <a class="mini good" href="{{ url_for('promotion_approve', id=r.id) }}">اعتماد</a>
+  <a class="mini bad" href="{{ url_for('promotion_reject', id=r.id) }}">رفض</a>
+</td>
+</tr>
+{% else %}
+<tr><td colspan="9">لا توجد طلبات</td></tr>
+{% endfor %}
+</table>
+</section>
+{% endblock %}

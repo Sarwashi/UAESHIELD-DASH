@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="hero pro">
+  <div class="shield">🛡</div>
+  <h1>UAE SHIELD RP 🛡</h1>
+  <p>لوحة التحكم الرئيسية</p>
+  <div class="hero-actions">
+    <a class="btn smallbtn" href="{{ url_for('send_dashboard_to_discord') }}">إرسال الداشبورد إلى Discord</a>
+  </div>
+</section>
+
+<div class="cards pro-cards">
+  <div class="card blue"><span>👥 إجمالي الإداريين</span><b>{{ stats.total }}</b><small>جميع الإداريين المسجلين</small></div>
+  <div class="card green"><span>✅ النشطين</span><b>{{ stats.active }}</b><small>الإداريين المتفاعلين</small></div>
+  <div class="card orange"><span>✈️ في إجازة</span><b>{{ stats.leave }}</b><small>الإداريين في إجازة</small></div>
+  <div class="card red"><span>🚫 باند</span><b>{{ stats.banned }}</b><small>إداريين عليهم باند</small></div>
+  <div class="card purple"><span>⚠️ غير متفاعلين</span><b>{{ stats.inactive }}</b><small>يحتاجون متابعة</small></div>
+  <div class="card teal"><span>⭐ طلبات الترقيات</span><b>{{ stats.pending_promotions }}</b><small>قيد المراجعة</small></div>
+  <div class="card cyan"><span>📅 طلبات الإجازات</span><b>{{ stats.pending_leaves }}</b><small>قيد المراجعة</small></div>
+</div>
+
+<div class="grid">
+  <section class="panel dark-head">
+    <h2>👑 القيادة العليا</h2>
+    <table>
+      <tr><th>المنصب</th><th>Discord ID</th><th>ID اللاعب</th><th>الاسم</th><th>الرتبة</th></tr>
+      {% for r in leaders %}
+      <tr><td>{{ r.position }}</td><td>{{ r.discord_id }}</td><td>{{ r.player_id }}</td><td>{{ r.name }}</td><td>{{ r.rank }}</td></tr>
+      {% else %}
+      <tr><td colspan="5">لا توجد بيانات</td></tr>
+      {% endfor %}
+    </table>
+  </section>
+
+  <section class="panel dark-head">
+    <h2>📌 آخر الطلبات</h2>
+    <table>
+      <tr><th>الرقم</th><th>الاسم</th><th>النوع</th><th>الحالة</th></tr>
+      {% for r in latest %}
+      <tr><td>{{ r.no }}</td><td>{{ r.name }}</td><td>{{ r.type }}</td><td><span class="badge">{{ r.status }}</span></td></tr>
+      {% else %}
+      <tr><td colspan="4">لا توجد طلبات</td></tr>
+      {% endfor %}
+    </table>
+  </section>
+</div>
+
+<section class="panel dark-head">
+  <h2>🏅 ترتيب الإداريين من أعلى رتبة إلى أدنى رتبة</h2>
+  <table>
+    <tr><th>#</th><th>Discord ID</th><th>ID اللاعب</th><th>الاسم</th><th>الرتبة</th><th>المنصب</th><th>الحالة</th></tr>
+    {% for r in staff %}
+    <tr>
+      <td>{{ r.rank_order }}</td><td>{{ r.discord_id }}</td><td>{{ r.player_id }}</td><td>{{ r.name }}</td>
+      <td>{{ r.rank }}</td><td>{{ r.position }}</td><td><span class="badge">{{ r.status }}</span></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">لا توجد بيانات</td></tr>
+    {% endfor %}
+  </table>
+</section>
+{% endblock %}
