@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UAE SHIELD RP</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <aside class="side">
+    <div class="logo">🛡<br><b>UAE SHIELD RP</b></div>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('staff_page') }}">إدارة البيانات</a>
+    <a href="{{ url_for('promotions') }}">الترقيات</a>
+    <a href="{{ url_for('leaves') }}">الإجازات</a>
+    <a href="{{ url_for('profile') }}">الملف الشخصي</a>
+    <a href="{{ url_for('settings') }}">الإعدادات</a>
+    {% if CONFIG.REQUIRE_LOGIN %}
+    <a href="{{ url_for('logout') }}">تسجيل خروج</a>
+    {% endif %}
+  </aside>
+
+  <main class="main">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+<script>
+async function staffSearch(inputId, selectId, detailsId) {
+  const input = document.getElementById(inputId);
+  const select = document.getElementById(selectId);
+  const details = document.getElementById(detailsId);
+  if (!input || !select) return;
+
+  const q = input.value || "";
+  const res = await fetch("/api/staff-search?q=" + encodeURIComponent(q));
+  const data = await res.json();
+
+  select.innerHTML = '<option value="">اختر الإداري من النتائج</option>';
+  data.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.discord_id;
+    opt.textContent = `${s.name || ""} | ${s.rank || ""} | Discord: ${s.discord_id || ""} | ID: ${s.player_id || ""} | ${s.position || ""}`;
+    opt.dataset.info = JSON.stringify(s);
+    select.appendChild(opt);
+  });
+
+  if (details) details.innerHTML = data.length ? "تم العثور على " + data.length + " نتيجة" : "لا توجد نتائج";
+}
+
+function showStaffDetails(selectId, detailsId) {
+  const select = document.getElementById(selectId);
+  const details = document.getElementById(detailsId);
+  if (!select || !details) return;
+  const opt = select.options[select.selectedIndex];
+  if (!opt || !opt.dataset.info) {
+    details.innerHTML = "";
+    return;
+  }
+  const s = JSON.parse(opt.dataset.info);
+  details.innerHTML = `
+    <div class="staff-preview">
+      <b>${s.name || ""}</b>
+      <span>Discord ID: ${s.discord_id || "-"}</span>
+      <span>ID اللاعب: ${s.player_id || "-"}</span>
+      <span>اليوزر: ${s.discord_user || "-"}</span>
+      <span>الرتبة: ${s.rank || "-"}</span>
+      <span>المنصب: ${s.position || "-"}</span>
+      <span>الحالة: ${s.status || "-"}</span>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>👤 الملف الشخصي</h1>
+<form class="search">
+  <input name="q" value="{{ q }}" placeholder="بحث Discord ID / ID اللاعب / الاسم / اليوزر">
+  <button>بحث</button>
+</form>
+
+{% if staff %}
+<section class="profile-card">
+  <h2>{{ staff.name }}</h2>
+  <div class="info">
+    <p><b>Discord ID:</b> {{ staff.discord_id }}</p>
+    <p><b>ID اللاعب:</b> {{ staff.player_id }}</p>
+    <p><b>اليوزر:</b> {{ staff.discord_user }}</p>
+    <p><b>الرتبة:</b> {{ staff.rank }}</p>
+    <p><b>المنصب:</b> {{ staff.position }}</p>
+    <p><b>الحالة:</b> <span class="badge">{{ staff.status }}</span></p>
+    <p><b>تاريخ الانضمام:</b> {{ staff.join_date }}</p>
+    <p><b>آخر ترقية:</b> {{ staff.last_promotion }}</p>
+  </div>
+</section>
+
+<section class="panel">
+<h2>⭐ سجل الترقيات والتنزيلات</h2>
+<table>
+<tr><th>رقم</th><th>من رتبة</th><th>إلى رتبة</th><th>نوع العملية</th><th>السبب</th><th>الحالة</th><th>تاريخ القرار</th></tr>
+{% for r in promotions %}
+<tr><td>{{ r.request_no }}</td><td>{{ r.from_rank }}</td><td>{{ r.to_rank }}</td><td>{{ r.operation_type }}</td><td>{{ r.reason }}</td><td>{{ r.status }}</td><td>{{ r.decision_date }}</td></tr>
+{% else %}<tr><td colspan="7">لا توجد ترقيات</td></tr>{% endfor %}
+</table>
+</section>
+
+<section class="panel">
+<h2>📅 سجل الإجازات</h2>
+<table>
+<tr><th>رقم</th><th>من</th><th>إلى</th><th>الأيام</th><th>السبب</th><th>الحالة</th><th>المعتمد من</th></tr>
+{% for r in leaves %}
+<tr><td>{{ r.leave_no }}</td><td>{{ r.start_date }}</td><td>{{ r.end_date }}</td><td>{{ r.days }}</td><td>{{ r.reason }}</td><td>{{ r.status }}</td><td>{{ r.approved_by }}</td></tr>
+{% else %}<tr><td colspan="7">لا توجد إجازات</td></tr>{% endfor %}
+</table>
+</section>
+
+<section class="panel">
+<h2>📌 سجل المناصب</h2>
+<table>
+<tr><th>رقم</th><th>المنصب</th><th>تاريخ التعيين</th><th>تاريخ الإعفاء</th><th>الحالة</th><th>ملاحظات</th></tr>
+{% for r in positions %}
+<tr><td>{{ r.log_no }}</td><td>{{ r.position }}</td><td>{{ r.assigned_date }}</td><td>{{ r.removed_date }}</td><td>{{ r.status }}</td><td>{{ r.notes }}</td></tr>
+{% else %}<tr><td colspan="6">لا توجد مناصب</td></tr>{% endfor %}
+</table>
+</section>
+{% elif q %}
+<div class="panel">لا توجد نتيجة.</div>
+{% endif %}
+{% endblock %}
